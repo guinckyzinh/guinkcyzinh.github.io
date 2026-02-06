@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditoria Mobile - M'Boi Mirim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --blue: #0056b3; --green: #28a745; --red: #dc3545; --bg: #f0f2f5; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
+        
+        /* CABEÇALHO ADAPTADO */
+        header { 
+            background: linear-gradient(135deg, #004a99, #007bff); 
+            color: white; padding: 25px 15px; text-align: center; 
+            border-radius: 0 0 20px 20px; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitulo { opacity: 0.9; font-size: 0.8rem; margin-top: 5px; }
+
+        .btn-voltar {
+            position: absolute; top: 18px; left: 10px;
+            background: rgba(255,255,255,0.2); border: 1px solid white; color: white;
+            padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.7rem;
+            display: none; font-weight: bold;
+        }
+
+        .container { width: 100%; max-width: 800px; margin: 15px auto; padding: 0 12px; }
+
+        /* TELAS */
+        .tela { display: none; animation: fadeIn 0.2s ease-out; }
+        .tela.ativa { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* MENU PRINCIPAL CARDS LARGOS NO MOBILE */
+        .grid-menu { display: flex; flex-direction: column; gap: 12px; }
+        .card-menu {
+            background: white; padding: 20px; border-radius: 15px; 
+            display: flex; align-items: center; gap: 20px;
+            cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .card-menu .emoji { font-size: 2.2rem; }
+        .card-menu h3 { margin: 0; color: var(--blue); font-size: 1.1rem; }
+        .card-menu p { margin: 2px 0 0; font-size: 0.85rem; color: #777; }
+
+        /* FORMULÁRIOS MOBILE-FRIENDLY */
+        .box-form { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .titulo-secao { color: var(--blue); font-size: 1.1rem; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--blue); }
+        
+        .campo { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; color: #555; }
+        input, select { 
+            width: 100%; padding: 12px; border: 1px solid #ccc; 
+            border-radius: 10px; font-size: 1rem; background: #fff;
+            appearance: none; /* Remove estilo padrão mobile */
+        }
+
+        /* CHECKLIST COM BOTÕES MAIORES */
+        .item-check { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px 0; border-bottom: 1px solid #eee; 
+        }
+        .item-check span { font-size: 0.9rem; padding-right: 10px; }
+        .item-check select { width: 85px; padding: 8px; text-align: center; font-weight: bold; }
+
+        .btn-salvar { 
+            width: 100%; background: var(--green); color: white; border: none; 
+            padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: 800; 
+            cursor: pointer; margin-top: 20px; 
+        }
+
+        /* PAINEL DE RESUMO (2 COLUNAS NO MOBILE) */
+        .painel-resumo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .card-resumo { background: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .card-resumo b { font-size: 1.3rem; color: var(--blue); display: block; }
+        .card-resumo small { font-size: 0.65rem; color: #888; text-transform: uppercase; }
+
+        /* TABELA COM SCROLL LATERAL */
+        .area-tabela { background: white; padding: 15px; border-radius: 15px; margin-top: 20px; }
+        .scroll-tabela { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { text-align: left; padding: 10px; background: #f8f9fa; color: #888; font-size: 0.7rem; text-transform: uppercase; }
+        td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        
+        .tag { padding: 4px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
+        .tag.sim { background: #d4edda; color: #155724; }
+        .tag.nao { background: #f8d7da; color: #721c24; }
+
+        @media print { header, .btn-salvar, .btn-voltar { display: none; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <button id="btnVoltar" class="btn-voltar" onclick="navegar('menu')">VOLTAR</button>
+    <h1>PS M'BOI MIRIM</h1>
+    <div class="subtitulo" id="textoSubtitulo">Auditoria de Qualidade</div>
+</header>
+
+<div class="container">
+
+    <div id="tela-menu" class="tela ativa">
+        <div class="grid-menu">
+            <div class="card-menu" onclick="navegar('triagem')">
+                <span class="emoji">📋</span>
+                <div><h3>TRIAGEM</h3><p>Fluxo e Enfermagem</p></div>
+            </div>
+            <div class="card-menu" onclick="navegar('medica')">
+                <span class="emoji">⚕️</span>
+                <div><h3>MÉDICA</h3><p>Consultórios e Condutas</p></div>
+            </div>
+            <div class="card-menu" onclick="navegar('imagem')">
+                <span class="emoji">☢️</span>
+                <div><h3>IMAGEM</h3><p>Raio-X, Tomo, USG, ECG</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tela-triagem" class="tela">
+        <div class="box-form">
+            <h2 class="titulo-secao">Triagem</h2>
+            <div class="campo"><label>Enfermeiro(a)</label><input type="text" id="t_resp"></div>
+            <div class="campo"><label>Data</label><input type="date" id="t_data"></div>
+            <div class="campo"><label>Fluxo</label><select id="t_fluxo"><option>Normal</option><option>G.O</option></select></div>
+            
+            <div class="item-check"><span>Jornada OK?</span><select id="t1"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Iniciais?</span><select id="t2"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>COREN?</span><select id="t3"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Horário?</span><select id="t4"><option>Sim</option><option>Não</option></select></div>
+            
+            <button class="btn-salvar" onclick="salvar('Triagem')">SALVAR REGISTRO</button>
+        </div>
+    </div>
+
+    <div id="tela-medica" class="tela">
+        <div class="box-form">
+            <h2 class="titulo-secao">Médica</h2>
+            <div class="campo"><label>Médico(a)</label><input type="text" id="m_resp"></div>
+            <div class="campo"><label>Data</label><input type="date" id="m_data"></div>
+            <div class="campo"><label>Local</label>
+                <select id="m_local">
+                    <option>Consultório 1</option><option>Consultório 2</option><option>Consultório 3</option>
+                    <option>Consultório 4</option><option>Consultório 5</option>
+                </select>
+            </div>
+            <div class="item-check"><span>Laboratório?</span><select id="m1"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Medicação?</span><select id="m2"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Tomo?</span><select id="m3"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Raio-X?</span><select id="m4"><option>Sim</option><option>Não</option></select></div>
+            <button class="btn-salvar" onclick="salvar('Medica')">SALVAR REGISTRO</button>
+        </div>
+    </div>
+
+    <div id="tela-imagem" class="tela">
+        <div class="box-form">
+            <h2 class="titulo-secao">Imagem</h2>
+            <div class="campo"><label>Auditor</label><input type="text" id="i_resp"></div>
+            <div class="campo"><label>Data</label><input type="date" id="i_data"></div>
+            
+            <div class="item-check"><span>Raio-X?</span><select id="i1"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Tomografia?</span><select id="i2"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>Ultrassom?</span><select id="i3"><option>Sim</option><option>Não</option></select></div>
+            <div class="item-check"><span>ECG?</span><select id="i4"><option>Sim</option><option>Não</option></select></div>
+            
+            <button class="btn-salvar" onclick="salvar('Imagem')">SALVAR REGISTRO</button>
+        </div>
+    </div>
+
+    <div id="area-relatorio" style="display:none; margin-top:20px;">
+        <div id="resumo-imagem" class="painel-resumo" style="display:none;">
+            <div class="card-resumo"><small>RX</small><b id="totRX">0</b></div>
+            <div class="card-resumo"><small>TC</small><b id="totTC">0</b></div>
+            <div class="card-resumo"><small>USG</small><b id="totUSG">0</b></div>
+            <div class="card-resumo"><small>ECG</small><b id="totECG">0</b></div>
+        </div>
+
+        <div class="area-tabela">
+            <h4 style="margin:0 0 10px 0; color:var(--blue); font-size:0.9rem;">HISTÓRICO RECENTE</h4>
+            <div class="scroll-tabela">
+                <table>
+                    <thead><tr id="th-tabela"></tr></thead>
+                    <tbody id="tb-tabela"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function navegar(destino) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        document.getElementById('area-relatorio').style.display = 'none';
+        document.getElementById('resumo-imagem').style.display = 'none';
+
+        if (destino === 'menu') {
+            document.getElementById('tela-menu').classList.add('ativa');
+            document.getElementById('btnVoltar').style.display = 'none';
+            document.getElementById('textoSubtitulo').innerText = "Auditoria de Qualidade";
+        } else {
+            document.getElementById('tela-' + destino).classList.add('ativa');
+            document.getElementById('btnVoltar').style.display = 'block';
+            document.getElementById('area-relatorio').style.display = 'block';
+            document.getElementById('textoSubtitulo').innerText = "Módulo " + destino.toUpperCase();
+            if(destino === 'imagem') document.getElementById('resumo-imagem').style.display = 'grid';
+            carregarTabela(destino);
+        }
+    }
+
+    function salvar(tipo) {
+        let dados = { id: Date.now(), tipo: tipo };
+        if (tipo === 'Triagem') {
+            dados.resp = document.getElementById('t_resp').value;
+            dados.data = document.getElementById('t_data').value;
+            dados.local = document.getElementById('t_fluxo').value;
+            dados.checks = [document.getElementById('t1').value, document.getElementById('t2').value, document.getElementById('t3').value, document.getElementById('t4').value];
+        } else if (tipo === 'Medica') {
+            dados.resp = document.getElementById('m_resp').value;
+            dados.data = document.getElementById('m_data').value;
+            dados.local = document.getElementById('m_local').value;
+            dados.checks = [document.getElementById('m1').value, document.getElementById('m2').value, document.getElementById('m3').value, document.getElementById('m4').value];
+        } else if (tipo === 'Imagem') {
+            dados.resp = document.getElementById('i_resp').value;
+            dados.data = document.getElementById('i_data').value;
+            dados.local = 'Imagem';
+            dados.checks = [document.getElementById('i1').value, document.getElementById('i2').value, document.getElementById('i3').value, document.getElementById('i4').value];
+        }
+
+        if (!dados.resp || !dados.data) { alert("Preencha os campos!"); return; }
+
+        let db = JSON.parse(localStorage.getItem('auditoria_v2')) || [];
+        db.push(dados);
+        localStorage.setItem('auditoria_v2', JSON.stringify(db));
+        alert("Salvo!");
+        carregarTabela(tipo.toLowerCase());
+    }
+
+    function carregarTabela(filtro) {
+        let db = JSON.parse(localStorage.getItem('auditoria_v2')) || [];
+        let tbody = document.getElementById('tb-tabela');
+        let thead = document.getElementById('th-tabela');
+        tbody.innerHTML = "";
+
+        if (filtro === 'triagem') thead.innerHTML = `<th>Data</th><th>Resp</th><th>Jorn</th><th>Inic</th><th>Coren</th><th>Hora</th><th>-</th>`;
+        else if (filtro === 'medica') thead.innerHTML = `<th>Data</th><th>Local</th><th>Lab</th><th>Med</th><th>TC</th><th>RX</th><th>-</th>`;
+        else thead.innerHTML = `<th>Data</th><th>Resp</th><th>RX</th><th>TC</th><th>USG</th><th>ECG</th><th>-</th>`;
+
+        let c = { rx:0, tc:0, usg:0, ecg:0 };
+
+        db.filter(d => d.tipo.toLowerCase() === filtro).reverse().forEach(item => {
+            if(filtro === 'imagem') {
+                if(item.checks[0] === 'Sim') c.rx++;
+                if(item.checks[1] === 'Sim') c.tc++;
+                if(item.checks[2] === 'Sim') c.usg++;
+                if(item.checks[3] === 'Sim') c.ecg++;
+            }
+
+            let tr = document.createElement('tr');
+            let dataF = item.data.split('-').reverse().slice(0,2).join('/'); // Data resumida para mobile
+            let html = `<td>${dataF}</td>`;
+            html += `<td>${item.resp.substring(0,8)}</td>`; // Nome cortado para caber
+
+            item.checks.forEach(val => {
+                html += `<td><span class="tag ${val==='Sim'?'sim':'nao'}">${val[0]}</span></td>`; // Apenas S ou N
+            });
+
+            html += `<td><b onclick="apagar(${item.id},'${filtro}')" style="color:red">X</b></td>`;
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+
+        if(filtro === 'imagem') {
+            document.getElementById('totRX').innerText = c.rx;
+            document.getElementById('totTC').innerText = c.tc;
+            document.getElementById('totUSG').innerText = c.usg;
+            document.getElementById('totECG').innerText = c.ecg;
+        }
+    }
+
+    function apagar(id, f) { if(confirm("Excluir?")) {
+        let db = JSON.parse(localStorage.getItem('auditoria_v2')).filter(i => i.id !== id);
+        localStorage.setItem('auditoria_v2', JSON.stringify(db));
+        carregarTabela(f);
+    }}
+
+    window.onload = function() {
+        let hoje = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('input[type="date"]').forEach(i => i.value = hoje);
+    }
+</script>
+
+</body>
+</html>
